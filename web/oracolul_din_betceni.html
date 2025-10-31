@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oracolul din Beteceni</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial Black', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            width: 100%;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .machine-container {
+            background: linear-gradient(145deg, #2c3e50, #34495e);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .bingo-container {
+            background: linear-gradient(145deg, #27ae60, #229954);
+            border-radius: 30px;
+            padding: 80px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .title {
+            text-align: center;
+            color: #f39c12;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+            letter-spacing: 2px;
+        }
+
+        .bingo-title {
+            text-align: center;
+            color: #fff;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+            letter-spacing: 2px;
+        }
+
+        .slots-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .slot {
+            background: linear-gradient(180deg, #1a1a1a, #2d2d2d);
+            border: 5px solid #f39c12;
+            border-radius: 15px;
+            width: 180px;
+            height: 120px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .slot-window {
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slot-reel {
+            position: absolute;
+            width: 100%;
+            transition: transform 0.1s linear;
+        }
+
+        .slot-item {
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .spin-button, .bingo-button {
+            display: block;
+            margin: 0 auto;
+            padding: 20px 60px;
+            font-size: 1.5em;
+            font-weight: bold;
+            background: linear-gradient(145deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .bingo-button {
+            background: linear-gradient(145deg, #f39c12, #e67e22);
+            box-shadow: 0 8px 20px rgba(243, 156, 18, 0.4);
+            margin-bottom: 20px;
+        }
+
+        .spin-button:hover:not(:disabled), .bingo-button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(231, 76, 60, 0.6);
+        }
+
+        .bingo-button:hover:not(:disabled) {
+            box-shadow: 0 12px 30px rgba(243, 156, 18, 0.6);
+        }
+
+        .spin-button:active:not(:disabled), .bingo-button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .spin-button:disabled, .bingo-button:disabled {
+            background: linear-gradient(145deg, #7f8c8d, #95a5a6);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .result-container {
+            margin-top: 30px;
+            text-align: center;
+            min-height: 80px;
+        }
+
+        .result {
+            background: rgba(255, 255, 255, 0.1);
+            border: 3px solid #f39c12;
+            border-radius: 15px;
+            padding: 20px;
+            font-size: 1.8em;
+            color: #fff;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.5s ease;
+        }
+
+
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .slot-label {
+            text-align: center;
+            color: #f39c12;
+            font-size: 0.9em;
+            margin-top: 8px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .slot-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bingo-card {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .bingo-cell {
+            background: white;
+            border: 3px solid #f39c12;
+            border-radius: 10px;
+            padding: 15px 10px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .bingo-cell:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .bingo-cell.marked {
+            background: linear-gradient(145deg, #e74c3c, #c0392b);
+            color: white;
+            border-color: #c0392b;
+        }
+
+        .bingo-cell.free {
+            background: linear-gradient(145deg, #f39c12, #e67e22);
+            color: white;
+            font-size: 1.2em;
+            border-color: #e67e22;
+        }
+
+        .bingo-message {
+            text-align: center;
+            color: #fff;
+            font-size: 1.2em;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: none;
+        }
+
+        .bingo-info {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9em;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .slot {
+                width: 150px;
+                height: 100px;
+            }
+            
+            .slot-item {
+                height: 100px;
+                font-size: 1.1em;
+            }
+            
+            .title, .bingo-title {
+                font-size: 1.8em;
+            }
+            
+            .result {
+                font-size: 1.4em;
+            }
+
+            .bingo-cell {
+                min-height: 80px;
+                font-size: 0.75em;
+                padding: 10px 5px;
+            }
+
+            .main-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="machine-container">
+            <h1 class="title">🎰 ORACOLUL DIN BETCENI 🎰</h1>
+            
+            <div class="slots-container">
+                <div class="slot-wrapper">
+                    <div class="slot" id="slot1">
+                        <div class="slot-window">
+                            <div class="slot-reel" id="reel1"></div>
+                        </div>
+                    </div>
+                    <div class="slot-label">Subiect</div>
+                </div>
+                
+                <div class="slot-wrapper">
+                    <div class="slot" id="slot2">
+                        <div class="slot-window">
+                            <div class="slot-reel" id="reel2"></div>
+                        </div>
+                    </div>
+                    <div class="slot-label">Verb</div>
+                </div>
+                
+                <div class="slot-wrapper">
+                    <div class="slot" id="slot3">
+                        <div class="slot-window">
+                            <div class="slot-reel" id="reel3"></div>
+                        </div>
+                    </div>
+                    <div class="slot-label">Adjectiv</div>
+                </div>
+                
+                <div class="slot-wrapper">
+                    <div class="slot" id="slot4">
+                        <div class="slot-window">
+                            <div class="slot-reel" id="reel4"></div>
+                        </div>
+                    </div>
+                    <div class="slot-label">Atribut</div>
+                </div>
+            </div>
+
+            <button class="spin-button" id="spinButton">DĂ O GHEARĂ!</button>
+
+            <div class="result-container">
+                <div class="result" id="result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="bingo-container">
+            <h1 class="bingo-title">🎲 BINGO 🎲</h1>
+            
+            <button class="bingo-button" id="bingoButton">Vreau să văd viitorul</button>
+            
+            <div class="bingo-card" id="bingoCard"></div>
+            
+            <div class="bingo-message" id="bingoMessage"></div>
+        </div>
+    </div>
+
+    <script>
+        const lists = [
+            ['Putin', 'Trump', 'Xi Jinping', 'UE', 'Rusia', 'Von der Leyen', 'Patriarhul Daniel', 'Călin Georgescu', 'Simion', 'extrema stangă', 'extrema dreaptă', 'centristii radicali', 'Stafia lui Ion Iliescu', 'Kim Jong Un', 'Cristian Tudor Popescu', 'Viktor Orban', 'Kier Starmer', 'Antifa', 'Miscarea MAGA'],
+            ['aprobă', 'invadează', 'desființează', 'privatizează', 'naționalizează', 'investeste 1 triliard de euro in', 'bombardează', 'distribuie gratis', 'a scris la 3 dimineața că', 'laudă'],
+            ['ONU', 'Transnistria', 'bombe atomice', 'un nou pachet de sancțiuni pe', 'centralele nucleare', 'Republica Populară', 'Labubu', 'Mar-a-Lago', 'Festivalul de la Cannes', 'Forumul Economic de la Davos', 'Casa Albă', 'Kremlinul', 'Ferentari', 'panouri solare', 'eoliene', 'vaccinuri', 'chipuri in Cola', 'Industria Calului(TM)', 'Soros', 'gazul rusesc', 'imigranții dinafara UE', 'Agenda Gay', 'Agenda Trans', 'Great Replacement Theory', 'incălzirea globală', 'AI', 'o greseala catastrofala pentru umanitate care putea fi prevenita usor', 'Antifa', 'MAGA', 'Tiktok'],
+            ['cu Labubu', 'ECO', 'de la Mar-a-Lago', 'la Festivalul de Film de la Cannes', 'la Forumul Economic de la Davos', 'pe TikTok', 'este bun/ă', 'este rea', 'a fost scos din context', 'e fake news', ' ', 'este ce are nevoie economia acum', 'este un rău necesar', 'este o utopie', 'un preț mic pentru omenire', 'in numele familiei tradiționale', 'pentru servicii deosebite aduse patriei', 'in numele siguranței naționale', 'pentru viitorul copiilor nostri', 'deoarece covfefe']
+        ];
+
+        const reels = [
+            document.getElementById('reel1'),
+            document.getElementById('reel2'),
+            document.getElementById('reel3'),
+            document.getElementById('reel4')
+        ];
+
+        const spinButton = document.getElementById('spinButton');
+        const resultDiv = document.getElementById('result');
+        const bingoButton = document.getElementById('bingoButton');
+        const bingoCard = document.getElementById('bingoCard');
+        const bingoMessage = document.getElementById('bingoMessage');
+        const bingoInfo = document.getElementById('bingoInfo');
+
+        let isSpinning = false;
+        let currentBingoSentences = [];
+        let markedCells = new Set();
+
+        // Generate random sentence
+        function generateRandomSentence() {
+            const selectedWords = lists.map(list => getRandomFromList(list));
+            const sentence = selectedWords.join(' ');
+            return sentence.charAt(0).toUpperCase() + sentence.slice(1);
+        }
+
+        // Initialize reels with repeated items for smooth animation
+        function initializeReels() {
+            reels.forEach((reel, index) => {
+                const list = lists[index];
+                let reelHTML = '';
+                
+                // Create multiple copies for smooth rolling effect
+                for (let i = 0; i < 20; i++) {
+                    list.forEach(item => {
+                        reelHTML += `<div class="slot-item">${item}</div>`;
+                    });
+                }
+                
+                reel.innerHTML = reelHTML;
+                reel.style.transform = 'translateY(0)';
+            });
+        }
+
+        function getRandomFromList(list) {
+            return list[Math.floor(Math.random() * list.length)];
+        }
+
+        function spinReel(reelElement, list, duration, finalWord) {
+            return new Promise((resolve) => {
+                const itemHeight = 120;
+                let currentOffset = 0;
+                const spinSpeed = 20;
+                const startTime = Date.now();
+                
+                const animate = () => {
+                    const elapsed = Date.now() - startTime;
+                    
+                    if (elapsed < duration) {
+                        currentOffset += spinSpeed;
+                        reelElement.style.transform = `translateY(-${currentOffset}px)`;
+                        requestAnimationFrame(animate);
+                    } else {
+                        const finalIndex = list.indexOf(finalWord);
+                        const finalOffset = (finalIndex + list.length * 10) * itemHeight;
+                        reelElement.style.transform = `translateY(-${finalOffset}px)`;
+                        reelElement.style.transition = 'transform 0.3s ease-out';
+                        
+                        setTimeout(() => {
+                            reelElement.style.transition = 'transform 0.1s linear';
+                            resolve();
+                        }, 300);
+                    }
+                };
+                
+                animate();
+            });
+        }
+
+        async function spin() {
+            if (isSpinning) return;
+            
+            isSpinning = true;
+            spinButton.disabled = true;
+            resultDiv.style.display = 'none';
+
+            const selectedWords = lists.map(list => getRandomFromList(list));
+            
+            const spinPromises = reels.map((reel, index) => {
+                const duration = 1000 + (index * 400);
+                return spinReel(reel, lists[index], duration, selectedWords[index]);
+            });
+
+            await Promise.all(spinPromises);
+
+            const sentence = selectedWords.join(' ');
+            const capitalizedSentence = sentence.charAt(0).toUpperCase() + sentence.slice(1);
+            resultDiv.textContent = capitalizedSentence;
+            resultDiv.style.display = 'block';
+
+            isSpinning = false;
+            spinButton.disabled = false;
+        }
+
+        function generateBingoCard() {
+            // Generate 24 random sentences
+            currentBingoSentences = [];
+            for (let i = 0; i < 24; i++) {
+                currentBingoSentences.push(generateRandomSentence());
+            }
+            
+            markedCells.clear();
+            bingoMessage.style.display = 'none';
+            bingoCard.innerHTML = '';
+
+            // Create 5x5 grid with FREE space in center
+            for (let i = 0; i < 25; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'bingo-cell';
+                
+                if (i === 12) { // Center cell
+                    cell.textContent = 'PULA MEA';
+                    cell.classList.add('free', 'marked');
+                    markedCells.add(i);
+                } else {
+                    const sentenceIndex = i < 12 ? i : i - 1;
+                    cell.textContent = currentBingoSentences[sentenceIndex];
+                    cell.dataset.index = i;
+                    
+                    cell.addEventListener('click', () => toggleCell(cell, i));
+                }
+                
+                bingoCard.appendChild(cell);
+            }
+        }
+
+        function toggleCell(cell, index) {
+            if (cell.classList.contains('free')) return;
+            
+            if (markedCells.has(index)) {
+                markedCells.delete(index);
+                cell.classList.remove('marked');
+            } else {
+                markedCells.add(index);
+                cell.classList.add('marked');
+            }
+            
+            checkBingo();
+        }
+
+        function checkBingo() {
+            const winPatterns = [
+                // Rows
+                [0, 1, 2, 3, 4],
+                [5, 6, 7, 8, 9],
+                [10, 11, 12, 13, 14],
+                [15, 16, 17, 18, 19],
+                [20, 21, 22, 23, 24],
+                // Columns
+                [0, 5, 10, 15, 20],
+                [1, 6, 11, 16, 21],
+                [2, 7, 12, 17, 22],
+                [3, 8, 13, 18, 23],
+                [4, 9, 14, 19, 24],
+                // Diagonals
+                [0, 6, 12, 18, 24],
+                [4, 8, 12, 16, 20]
+            ];
+
+            for (const pattern of winPatterns) {
+                if (pattern.every(index => markedCells.has(index))) {
+                    bingoMessage.textContent = '🎉 BINGO! Acum spera sa urmeze o iarna nucleara! 🎉';
+                    bingoMessage.style.display = 'block';
+                    return;
+                }
+            }
+            
+            bingoMessage.style.display = 'none';
+        }
+
+        spinButton.addEventListener('click', spin);
+        bingoButton.addEventListener('click', generateBingoCard);
+
+        // Initialize on load
+        initializeReels();
+        generateBingoCard(); // Auto-generate bingo card on load
+    </script>
+</body>
+</html>
